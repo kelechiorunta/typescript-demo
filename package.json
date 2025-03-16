@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "compile": "npx tsc",
+    "start": "node typescript-demo.js",
+    "fullstart": "npm run compile && npm start"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.2"
+  }
+}
