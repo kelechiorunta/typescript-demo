@@ -1,5 +1,5 @@
 // Explicit type declaration and assignment
-let firstname: string = "Kelechi";
+let printname: string = "Kelechi";
 
 // When type declaration is not explicitly declared, use 
 // unknown as the type assignment rather than any type a safer alternative.
@@ -46,3 +46,52 @@ ourTuple = [5, false, 'Coding God was here'];
 
 const namedArray: [x: string, y: boolean] = ["hello", true];
 const [a, b] = namedArray;
+
+// Type checking for objects
+const car: {type: string, name: string, invogue: boolean} = {
+    type: "car",
+    name: "Ford",
+    invogue: true
+}
+
+class Car {
+    name: string
+    constructor(
+        public brand: string,
+        public model: string,
+        public plateNumber: string,
+    ) {
+        this.name = brand + model + plateNumber;
+    }
+}
+
+let ford = new Car("AA", "Ford", "443");
+console.log(ford)
+
+type setter = string | string[] | Promise<number>
+
+async function getCountries(p: string): Promise<any[]> {
+    const options: RequestInit = {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    }
+   
+        try {
+            const response = await fetch(p, options)
+            const result = await response.json();
+            return result?.users
+        }
+        catch(err) {
+            throw err
+        }
+   
+}
+async function getname(): Promise < string > {
+    return "America"
+}
+
+getCountries('https://dummyjson.com/users')
+  .then(users => console.log(users))
+  .catch(err => console.error(err));
