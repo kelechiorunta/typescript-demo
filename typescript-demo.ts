@@ -70,16 +70,16 @@ console.log(ford)
 
 type setter = string | string[] | Promise<number>
 
-async function getCountries(p: string): Promise<any[]> {
+async function getUsers(url: string, method: "GET" | "POST"): Promise<any[]> {
     const options: RequestInit = {
-        method: "GET",
+        method,
         headers: {
             "Content-Type": "application/json"
         }
     }
    
         try {
-            const response = await fetch(p, options)
+            const response = await fetch(url, options)
             const result = await response.json();
             return result?.users
         }
@@ -92,6 +92,8 @@ async function getname(): Promise < string > {
     return "America"
 }
 
-getCountries('https://dummyjson.com/users')
+getUsers('https://dummyjson.com/users', "GET" )
   .then(users => console.log(users))
   .catch(err => console.error(err));
+
+

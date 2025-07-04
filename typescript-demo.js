@@ -62,16 +62,16 @@ class Car {
 }
 let ford = new Car("AA", "Ford", "443");
 console.log(ford);
-function getCountries(p) {
+function getUsers(url, method) {
     return __awaiter(this, void 0, void 0, function* () {
         const options = {
-            method: "GET",
+            method,
             headers: {
                 "Content-Type": "application/json"
             }
         };
         try {
-            const response = yield fetch(p, options);
+            const response = yield fetch(url, options);
             const result = yield response.json();
             return result === null || result === void 0 ? void 0 : result.users;
         }
@@ -85,6 +85,6 @@ function getname() {
         return "America";
     });
 }
-getCountries('https://dummyjson.com/users')
+getUsers('https://dummyjson.com/users', "GET")
     .then(users => console.log(users))
     .catch(err => console.error(err));
