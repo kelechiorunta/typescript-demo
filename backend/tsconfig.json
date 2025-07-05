@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    // "outDir": "./dist",
+    // "rootDir": "./backend",
+    "strict": true,
+    "esModuleInterop": true
+  },
+  // "include": ["/backend"],
+  "exclude": ["../frontend", "node_modules"]
+}
+
