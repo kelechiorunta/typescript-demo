@@ -1,10 +1,22 @@
 import express, { Request, Response } from 'express';
 import cors, { CorsOptions } from 'cors';
 import bodyParser from 'body-parser';
+import dotenv from 'dotenv';
+import ConnectMongoDBSession from 'connect-mongodb-session'
+import session from 'express-session'
+
+dotenv.config();
+import authRouter from './authRouter';
+import { connectDB } from './db';
+
+
 
 const app = express();
 const PORT: number = 3700;
+const mongo_uri = process.env.MONGO_URI
+const session_secret = process.env.SESSION_SECRET
 
+// Cors options
 const allowedOrigins: string[] = ['http://localhost:3700', 'http://localhost:3001'];
 const allowedMethods = ['GET', 'POST', 'PUT'] ;
 const allowedHeaders = ['Authorization', 'Content-Type'];
@@ -24,8 +36,43 @@ const corsOptions: CorsOptions = {
   credentials: credentials,
 };
 
+// Mongo Database Connection
+if (!mongo_uri) {
+    throw new Error('Database credentials are missing from environment variables.');
+  }
+connectDB(mongo_uri!)
+
+// Session store configuration 
+const MongoDBStore = ConnectMongoDBSession(session)
+const store = new MongoDBStore({
+  uri: mongo_uri,
+  collection: 'sessions',
+  expires: 1000 * 60 * 60 * 24 * 7
+} // Sessions expire after 1 week}
+);
+
+// Session options
+if (!session_secret) {
+    throw new Error('Session secret is missing from environment variables.');
+  }
+const sessionOptions: any = {
+    name: "auth_session",
+    secret: session_secret,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: false,           // don’t use true unless HTTPS
+      sameSite: 'lax',
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
+    },
+    store: store
+}
+
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
+app.use(session(sessionOptions));
+app.use('/auth', authRouter)
 
 // get Dummy Users
 async function getUsers(url: string, method: "GET" | "POST"): Promise<any[]> {
