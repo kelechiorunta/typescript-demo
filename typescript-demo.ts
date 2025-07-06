@@ -92,7 +92,7 @@ async function getname(): Promise < string > {
     return "America"
 }
 
-getUsers('https://dummyjson.com/users', "GET" )
+getUsers('https://dummyjson.com/users', 'GET' )
   .then(users => console.log(users))
   .catch(err => console.error(err));
 
