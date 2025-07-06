@@ -15,7 +15,7 @@ export default function User() {
             credentials: 'include'
           });
           const result = await response.json();
-          setUsers(result|| []);
+          setUsers(result || []);
         } catch (err) {
           console.error("Failed to fetch users:", err);
         }
