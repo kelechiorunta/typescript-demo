@@ -6,17 +6,28 @@ import dotenv from 'dotenv';
 import ConnectMongoDBSession from 'connect-mongodb-session';
 import session from 'express-session';
 import passport from 'passport';
+import { fileURLToPath } from 'url';
+import path from 'path';
+import { loadFilesSync } from '@graphql-tools/load-files'
+import { makeExecutableSchema } from '@graphql-tools/schema';
+import { graphqlHTTP } from 'express-graphql';
 
 dotenv.config();
 import authRouter from './authRouter';
 import { connectDB } from './db';
-
+import resolvers from './resolvers';
 
 // Initiate app and environment variables
 const app = express();
 const PORT: number = 3700;
 const mongo_uri = process.env.MONGO_URI
 const session_secret = process.env.SESSION_SECRET
+
+// Initialize schema
+const typeDefs = loadFilesSync(path.join(__dirname, 'schema.graphql'))
+const schema = makeExecutableSchema({
+    typeDefs, resolvers
+})
 
 // Cors options
 const allowedOrigins: string[] = ['http://localhost:3700', 'http://localhost:3001'];
@@ -83,6 +94,30 @@ app.use(passport.session())
 
 // Setup auth routes
 app.use('/auth', authRouter)
+
+// Setup graphql transport layer graphqlHTTP
+
+  // Middleware to enable GraphQL Introspection and Client Queries
+  app.use(
+    '/graphql',
+    graphqlHTTP((req: any) => {
+      const isDev = process.env.NODE_ENV === 'development';
+      const protocol = isDev ? 'http' : 'https';//'ws' : 'wss';
+      const host = isDev ? 'localhost:3700' : req.headers.host;
+  
+      return {
+        schema,
+          context: {   
+                isAuthenticated: req.isAuthenticated?.(),
+                user: req.user ?? req.session?.user,
+          },
+        graphiql: true
+        // graphiql: {
+        //   subscriptionEndpoint: `${protocol}://${host}/graphql`,
+        // },
+      };
+    })
+);  
 
 // get Dummy Users
 async function getUsers(url: string, method: "GET" | "POST"): Promise<any[]> {
