@@ -2,5 +2,6 @@
     "cSpell.words": [
         "handlelogout",
         "Kelechi"
-    ]
+    ],
+    "cSpell.ignoreWords": ["graphiql"]
 }
