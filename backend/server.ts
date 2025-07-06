@@ -1,16 +1,18 @@
 import express, { Request, Response } from 'express';
 import cors, { CorsOptions } from 'cors';
 import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
-import ConnectMongoDBSession from 'connect-mongodb-session'
-import session from 'express-session'
+import ConnectMongoDBSession from 'connect-mongodb-session';
+import session from 'express-session';
+import passport from 'passport';
 
 dotenv.config();
 import authRouter from './authRouter';
 import { connectDB } from './db';
 
 
-
+// Initiate app and environment variables
 const app = express();
 const PORT: number = 3700;
 const mongo_uri = process.env.MONGO_URI
@@ -32,8 +34,8 @@ const corsOptions: CorsOptions = {
     }
   },
   methods: allowedMethods,
-  allowedHeaders: allowedHeaders,
-  credentials: credentials,
+  allowedHeaders,
+  credentials,
 };
 
 // Mongo Database Connection
@@ -66,12 +68,20 @@ const sessionOptions: any = {
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
     },
-    store: store
+    store: store,
 }
 
+// Third-party Middlewares for cors, bodyParser and session
 app.use(cors(corsOptions));
+app.use(cookieParser())
 app.use(bodyParser.json());
 app.use(session(sessionOptions));
+
+// Initialize passport
+app.use(passport.initialize())
+app.use(passport.session())
+
+// Setup auth routes
 app.use('/auth', authRouter)
 
 // get Dummy Users
