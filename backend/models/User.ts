@@ -18,6 +18,7 @@ interface IUser extends Document {
     resetPasswordToken: string,
     resetPasswordExpires: Date,
     google: any,
+    image: string
 }
 
 const userSchema = new mongoose.Schema<IUser>({
@@ -26,6 +27,7 @@ const userSchema = new mongoose.Schema<IUser>({
     password: { type: String, required: false },
     createdAt: { type: Date, default: Date.now },
     picture: { type: String, required: false, default: '' },
+    image: { type: String, required: false, default: '' },
     lastMessage: { type: String, required: false, default: '' },
     lastMessageCount: { type: Number, required: false, default: 0 },
     isOnline: { type: Boolean, required: false, default: null },
