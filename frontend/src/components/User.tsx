@@ -1,54 +1,68 @@
-import React, { useState, useEffect } from 'react'
-// import { redirect } from 'react-router-dom';
+import React from 'react';
+import { useQuery } from '@apollo/client';
+import { Modal, Spinner } from 'react-bootstrap';
+import { GET_CLIENTS } from '../graphqlClient/queries';
 
 export default function User() {
-    const [users, setUsers] = useState<any[]>([]);
+  const { data: clientdata, loading: clientloading, error } = useQuery(GET_CLIENTS);
 
-    useEffect(() => {
-      const fetchUsers = async () => {
-        try {
-          const response = await fetch("http://localhost:3700/users", {
-            method: "GET",
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            credentials: 'include'
-          });
-          const result = await response.json();
-          setUsers(result || []);
-        } catch (err) {
-          console.error("Failed to fetch users:", err);
-        }
-      };
-  
-      fetchUsers();
-    }, []); // Empty dependency array = run once on mount
-
-    const handlelogout = async(): Promise<any> => {
-        try {
-            window.location.href = 'http://localhost:3700/auth/logout'
-        } catch (err: any) {
-            console.error(err)
-        }
+  const handleLogout = async (): Promise<void> => {
+    try {
+      window.location.href = 'http://localhost:3700/auth/logout';
+    } catch (err: any) {
+      console.error(err);
     }
-  
+  };
+
+  if (clientloading) {
     return (
-      <div className="App">
-            <h1>Users List</h1>
-            <button onClick={handlelogout}>Logout</button>
-        <ul>
-          {users.length > 0 ? (
-            users.map((user: any, index: number) => (
-              <div style={{display: 'flex', gap: 20, justifyContent: 'space-between', width: 'max-content'}} className=''>
-                <li key={index}>{user?.firstName}</li>
-                {/* <li key={index}>{user?.lastName}</li> */}
-              </div>
-              
-            ))
-          ) : (
-            <li>No users found.</li>
-          )}
-        </ul>
-      </div>
+      <Modal show centered backdrop="static" keyboard={false}>
+        <Modal.Body
+          className="d-flex flex-column align-items-center justify-content-center"
+          style={{
+            padding: '2rem',
+            fontFamily: 'Segoe UI, Roboto, sans-serif',
+            fontSize: '1.1rem',
+            textAlign: 'center',
+            minHeight: '200px',
+          }}
+        >
+          <Spinner animation="border" role="status" variant="primary" style={{ width: '3rem', height: '3rem' }} />
+          <div className="mt-4" style={{ fontWeight: '500', color: '#333' }}>
+            Loading Clients, please wait...
+          </div>
+        </Modal.Body>
+      </Modal>
     );
+  }
+
+  const users = clientdata?.clients ?? [];
+
+  return (
+    <div className="App">
+      <h1>Users List</h1>
+      <button onClick={handleLogout}>Logout</button>
+          <ul>
+              {console.log(clientdata?.clients)}
+        {clientdata && clientdata.clients ? (
+          clientdata.clients.map((user: any, index: number) => (
+            <div
+              key={index}
+              style={{
+                display: 'flex',
+                gap: 20,
+                justifyContent: 'space-between',
+                width: 'max-content',
+              }}
+            >
+                  <li>{user?.username}</li>
+                  <img src={user.image} alt='Profile' width={100} height={100}/>
+            </div>
+          ))
+        ) : (
+          <li>No users found.</li>
+        )}
+      </ul>
+    </div>
+  );
 }
