@@ -120,12 +120,13 @@ app.use('/auth', authRouter)
 );  
 
 // get Dummy Users
-async function getUsers(url: string, method: "GET" | "POST"): Promise<any[]> {
+export async function getUsers(url: string, method: "GET" | "POST"): Promise<any[]> {
     const options: RequestInit = {
         method,
         headers: {
             "Content-Type": "application/json"
-        }
+        },
+        credentials: 'include'
     }
    
         try {
