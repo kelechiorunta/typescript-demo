@@ -1,5 +1,5 @@
 // components/VisitorClient.tsx
-import React from 'react';
+import React, { useState } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import { useOutletContext } from 'react-router-dom';
 
@@ -12,13 +12,16 @@ export type AuthContextType = {
   email: string;
   picture: string;
   phone: string;
-  gender: string
+  gender: string;
+  backgroundImage: string;
   // add more based on your `data.auth` structure
 };
 
 const VisitorClient: React.FC = () => {
 
     const authUser = useOutletContext<AuthContextType>();
+    const storedCurrentUser = authUser
+    const [currentUser, setCurrentUser] = useState<AuthContextType>(() => ({ ...authUser }));
 
   return (
     <Container fluid className="gx-0 " style={{backgroundColor: 'rgba(250,122,82,0.2)'}}>
@@ -27,7 +30,7 @@ const VisitorClient: React.FC = () => {
           <Sidebar />
         </Col>
         <Col xs={12} md={9} lg={10}>
-          <UserContent authUser={authUser} />
+          <UserContent storedUser={storedCurrentUser} authUser={currentUser} currentUser={currentUser} setCurrentUser={setCurrentUser} />
         </Col>
       </Row>
     </Container>
