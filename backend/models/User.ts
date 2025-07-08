@@ -18,7 +18,11 @@ interface IUser extends Document {
     resetPasswordToken: string,
     resetPasswordExpires: Date,
     google: any,
-    image: string
+    image: string,
+    phone: string,
+    birthdate: string,
+    gender: string,
+    backgroundImage: string
 }
 
 const userSchema = new mongoose.Schema<IUser>({
@@ -28,8 +32,12 @@ const userSchema = new mongoose.Schema<IUser>({
     createdAt: { type: Date, default: Date.now },
     picture: { type: String, required: false, default: '' },
     image: { type: String, required: false, default: '' },
+    birthdate: { type: String, required: false, default: new Date().toLocaleDateString },
+    gender: { type: String, required: false, default: 'Male' },
+    phone: { type: String, required: false, default: '' },
     lastMessage: { type: String, required: false, default: '' },
     lastMessageCount: { type: Number, required: false, default: 0 },
+    backgroundImage: { type: String, required: false, default: '' },
     isOnline: { type: Boolean, required: false, default: null },
     unread: [{ type: mongoose.Schema.Types.ObjectId, ref: 'UnreadMsg' }],
     token: { type: String, required: false },
