@@ -7,7 +7,7 @@ const FaCommentIcon = FaComment as unknown as React.FC<React.SVGProps<SVGSVGElem
 
 const Feed: React.FC = () => {
     return (
-      <div style={{color: ' #a303a0'}}>
+      <div style={{color: ' #a303a0', height: '590px', overflow: 'scroll'}}>
             {/* Tabs */}
     <Card style={{color: ' #a303a0'}} className="mb-3 shadow-sm">
       <Nav style={{color: ' #a303a0'}} variant="tabs" defaultActiveKey="posts" className="mb-3">
@@ -39,7 +39,8 @@ const Feed: React.FC = () => {
         </Nav.Item>
     </Nav>
     
-      <Card.Body>
+    <Card.Body className='d-flex flex-column gap-4'>
+    <div >
         <div className="d-flex align-items-center mb-3">
           <Image
             src="https://randomuser.me/api/portraits/men/1.jpg"
@@ -69,7 +70,42 @@ const Feed: React.FC = () => {
         <div className="d-flex justify-content-between text-muted">
           <span><FaHeartIcon className="me-2 text-danger" />1,498</span>
           <span><FaCommentIcon className="me-2 text-primary" />3,000</span>
+        </div>                
+    </div>
+                    
+    <div >
+        <div className="d-flex align-items-center mb-3">
+          <Image
+            src="https://randomuser.me/api/portraits/men/2.jpg"
+            roundedCircle
+            width={50}
+            height={50}
+            className="me-3"
+          />
+          <div>
+            <strong>Shanice Deo</strong>
+            <div className="text-muted" style={{ fontSize: '0.85rem' }}>15 mins ago</div>
+          </div>
         </div>
+
+        <Card.Img
+          src={'./background.jpg'}
+        //src="https://images.unsplash.com/photo-1520975918108-7c8e9316c362"
+          alt="Post"
+          className="rounded"
+          height={150}
+        />
+
+        <Card.Text className="mt-2">
+          <strong>Shanice Deo</strong> New Blazer out here... $500!!!!
+        </Card.Text>
+
+        <div className="d-flex justify-content-between text-muted">
+          <span><FaHeartIcon className="me-2 text-danger" />1,098</span>
+          <span><FaCommentIcon className="me-2 text-primary" />2,000</span>
+        </div>                
+    </div>
+        
       </Card.Body>
     </Card>
     </div>
