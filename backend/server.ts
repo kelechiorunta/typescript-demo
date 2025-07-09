@@ -11,6 +11,8 @@ import path from 'path';
 import { loadFilesSync } from '@graphql-tools/load-files'
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { graphqlHTTP } from 'express-graphql';
+import { Server } from 'socket.io';
+import { createServer } from 'http';
 
 dotenv.config();
 import authRouter from './authRouter';
@@ -108,6 +110,7 @@ app.use('/auth', authRouter)
       return {
         schema,
           context: {   
+                req,
                 isAuthenticated: req.isAuthenticated?.(),
                 user: req.user ?? req.session?.user,
           },
@@ -151,6 +154,21 @@ app.get('/users', (req: Request, res: Response) => {
 
 })
 
-app.listen(PORT, () => {
+// Create a http server instance of the express app/server
+const httpServer = createServer(app);
+
+// Bind the httpServer to the socket.io server(websocket server) for initial TCP handshake/connection
+const io = new Server(httpServer, { cors: corsOptions })
+
+// Get the io reference from the app server
+app.set('io', io);
+
+// socket-io server listens for bidirectional and persistent TCP connection with io-client
+io.on('connection', () => {
+    console.log('Socket.io server is connected')
+})
+
+// http server listens for initial TCP connection
+httpServer.listen(PORT, () => {
   console.log(`Server is listening at PORT ${PORT}`);
 });
