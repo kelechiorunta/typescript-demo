@@ -1,5 +1,7 @@
 import User from "./models/User";
 import { getUsers } from "./server";
+import { GraphQLContext } from "./types/types";
+
 
 const resolvers = {
     Query: {
@@ -61,7 +63,7 @@ const resolvers = {
     },
 
     Mutation: {
-        updateProfileBackground: async (_: any, { username, backgroundImage }: { username: string, backgroundImage: string }) => {
+        updateProfileBackground: async (_: any, { username, backgroundImage }: { username: string, backgroundImage: string }, context: GraphQLContext) => {
           const user = await User.findOneAndUpdate(
             { username },
             { backgroundImage },
@@ -71,9 +73,28 @@ const resolvers = {
           if (!user) {
             throw new Error('User not found');
           }
+            
+          const io = context.req.app.get('io'); // get socket.io instance
+    
+          io.emit('newMessage', user);
     
           return user;
-        }
+        },
+
+        sendMessage: async (_: any, { content }: {content: any}, { req }: {req: any}) => {
+            const io = req.app.get('io'); // get io instance from Express
+      
+            // Perform DB operations, etc...
+            const newMessage = {
+              id: Date.now().toString(),
+              content,
+              timestamp: new Date().toISOString(),
+            };
+      
+            io.emit('newMessage', newMessage); // 🔥 emit socket event
+      
+            return newMessage;
+          },
       }
 }
 
