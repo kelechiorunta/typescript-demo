@@ -8,6 +8,8 @@ export const AUTH = gql`
       username
       picture
       phone
+      image
+      gender
       lastMessage
       lastMessageCount
       isOnline
@@ -17,9 +19,28 @@ export const AUTH = gql`
 }
 `;
 
+export const GET_OTHER_CLIENTS = gql`
+  query GetContacts {
+    otherClients {
+      _id
+      email
+      username
+      picture
+      image
+      gender
+      phone
+      backgroundImage
+      lastMessage
+      lastMessageCount
+      isOnline
+  }
+}
+`;
+
 export const GET_CLIENTS = gql`
   query getClients {
     clients {
+      _id
       email
       username
       picture
