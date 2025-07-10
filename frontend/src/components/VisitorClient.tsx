@@ -18,6 +18,7 @@ export type AuthContextType = {
   gender: string;
   backgroundImage: string;
   isOnline: boolean;
+  videoId: any
 };
 
 const VisitorClient: React.FC = () => {
@@ -80,7 +81,7 @@ const VisitorClient: React.FC = () => {
           return updated;
         });
       });
-  }, [currentUser, socket]);
+  }, [socket]);
 
   return (
     <Container fluid className="gx-0" style={{ backgroundColor: 'rgba(250,122,82,0.2)' }}>

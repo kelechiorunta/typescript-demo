@@ -102,8 +102,8 @@ const ActiveUsers: React.FC<ActiveUsersProps> = ({
             style={{ height: '49vh', overflowY: 'scroll', color: '#a303a0' }}
             variant="flush"
           >
-            {clients.length > 0 &&
-              clients.map((user, index) => (
+            {data.otherClients.length > 0 &&
+              data.otherClients.map((user: AuthContextType, index: number) => (
                 <ListGroup.Item
                   key={index}
                   className="d-flex align-items-center justify-content-between"
