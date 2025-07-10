@@ -18,6 +18,7 @@ dotenv.config();
 import authRouter from './authRouter';
 import { connectDB } from './db';
 import resolvers from './resolvers';
+import User from './models/User';
 
 // Initiate app and environment variables
 const app = express();
@@ -163,9 +164,52 @@ const io = new Server(httpServer, { cors: corsOptions })
 // Get the io reference from the app server
 app.set('io', io);
 
+const onlineUsers = new Map();
 // socket-io server listens for bidirectional and persistent TCP connection with io-client
-io.on('connection', () => {
-    console.log('Socket.io server is connected')
+io.on('connection', (socket: any) => {
+    console.log('Socket.io server is connected');
+
+    socket.on('authenticated', async ({ userId }: { userId: any }) => {
+        socket.data.userId = userId;
+        onlineUsers.set(userId, socket.id)
+        const onlineUser = await User.findById(userId);
+        if (onlineUser) {
+            onlineUser.isOnline = true
+            await onlineUser.save();
+            socket.broadcast.emit('userOnline', { userId, online: onlineUser.isOnline });
+        }   
+        console.log(onlineUsers);
+    
+        // Notify others this user came online
+       
+    
+        // ✅ Send current online users to the newly logged-in user
+        const otherOnlineUsers = [...onlineUsers.keys()].filter((id) => id !== userId);
+        // Set isOnline = true in DB for others (optional if you want to persist status)
+        for (const id of otherOnlineUsers) {
+            const userDoc = await User.findById(id);
+            if (userDoc) {
+                userDoc.isOnline = true;
+                await userDoc.save();
+            }
+        }
+       
+        socket.emit('usersOnline', { userIds: otherOnlineUsers, online: true });
+    })
+
+    socket.on('disconnect', async() => {
+        console.log('🔴 Client disconnected:', socket.id);
+        const userId = socket.data.userId;
+        if (userId) {
+            const signedOutUser = await User.findById(userId)
+            if (signedOutUser) {
+                signedOutUser.isOnline = false
+                await signedOutUser.save();
+            }
+        onlineUsers.delete(userId);
+        socket.broadcast.emit('userOffline', { userId });
+    }
+    });
 })
 
 // http server listens for initial TCP connection
