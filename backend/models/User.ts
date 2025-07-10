@@ -23,11 +23,13 @@ interface IUser extends Document {
     birthdate: string,
     gender: string,
     backgroundImage: string
+    videoId?: mongoose.Types.ObjectId;
 }
 
 const userSchema = new mongoose.Schema<IUser>({
     username: { type: String, required: false, default: 'Anonymous User'  },
     email: { type: String, required: false, validate: validator.isEmail },
+    videoId: { type: mongoose.Schema.Types.ObjectId, required: false },
     password: { type: String, required: false },
     createdAt: { type: Date, default: Date.now },
     picture: { type: String, required: false, default: '' },

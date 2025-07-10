@@ -16,6 +16,7 @@ import { createServer } from 'http';
 
 dotenv.config();
 import authRouter from './authRouter';
+import videoRouter from './videoRouter';
 import { connectDB } from './db';
 import resolvers from './resolvers';
 import User from './models/User';
@@ -36,6 +37,7 @@ const schema = makeExecutableSchema({
 const allowedOrigins: string[] = ['http://localhost:3700', 'http://localhost:3001'];
 const allowedMethods = ['GET', 'POST', 'PUT'] ;
 const allowedHeaders = ['Authorization', 'Content-Type'];
+const exposedHeaders = ['Content-Range', 'Accept-Ranges', 'Content-Length', 'Content-Type'];
 const credentials = true;
 
 const corsOptions: CorsOptions = {
@@ -50,6 +52,7 @@ const corsOptions: CorsOptions = {
   methods: allowedMethods,
   allowedHeaders,
   credentials,
+  exposedHeaders
 };
 
 // Mongo Database Connection
@@ -96,7 +99,10 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 // Setup auth routes
-app.use('/auth', authRouter)
+app.use('/auth', authRouter);
+
+// Setup auth routes
+app.use('/api', videoRouter);
 
 // Setup graphql transport layer graphqlHTTP
 

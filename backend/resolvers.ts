@@ -11,13 +11,6 @@ const resolvers = {
             try {
               const users = await User.find({ _id: { $ne: context.user._id } });
                 return users
-            //   const enhancedUsers = users.map((user) => {
-            //     const userObj = user.toObject();
-            //     userObj.unreadCounts = formatUnreadCounts(user.unreadCounts);
-            //     return userObj;
-            //   });
-      
-            //   return enhancedUsers;
             } catch (error) {
               console.error(error);
               throw new Error("Failed to fetch users");
@@ -27,6 +20,11 @@ const resolvers = {
         auth: async (_: any, args: any, context: any) => {
             if (!context?.user) return null;
             return context.user
+        },
+
+        getVideo: async (_:any, { email }: { email: string }, context: any) => {
+            // Make sure the token is verified here if needed
+            return `http://localhost:3700/api/videos/${email}`;
         },
 
         filteredClients: async (_: any, args: any, context: any) => {
