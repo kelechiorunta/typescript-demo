@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema<IUser>({
     createdAt: { type: Date, default: Date.now },
     picture: { type: String, required: false, default: '' },
     image: { type: String, required: false, default: '' },
-    birthdate: { type: String, required: false, default: new Date().toLocaleDateString },
+    birthdate: { type: String, required: false, default: '' },
     gender: { type: String, required: false, default: 'Male' },
     phone: { type: String, required: false, default: '' },
     lastMessage: { type: String, required: false, default: '' },
