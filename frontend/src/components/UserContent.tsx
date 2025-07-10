@@ -7,6 +7,7 @@ import ProfileHeader from './ProfileHeader';
 import About from './About';
 import Feed from './Feed';
 import OtherClients from './OtherClients';
+import Video from './Video';
 
 interface UserContentProps {
     authUser: AuthContextType;
@@ -33,10 +34,11 @@ const UserContent: React.FC<UserContentProps> = ({data, loading, onlineUsers, cl
 
       <Row style={{ color: '#a303a0', height: 'max-content', overflow: 'auto' }} className="gx-2">
         <Col xs={12} md={6} lg={4}>
-          <About authUser={authUser} currentUser={currentUser} />
+            <About authUser={authUser} currentUser={currentUser} />
+            <Video email={storedUser?.email}/>
         </Col>
         <Col xs={12} md={6} lg={4}>
-          <Feed />
+          <Feed data={data} loading={loading} clients={clients} />
         </Col>
         <Col xs={12} md={12} lg={4}>
           <OtherClients data={data} loading={loading} onlineUsers={onlineUsers} clients={clients} />
