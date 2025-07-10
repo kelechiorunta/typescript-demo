@@ -12,7 +12,11 @@ const FaChartBarIcon = FaChartBar as unknown as React.FC<React.SVGProps<SVGSVGEl
 const FaCogIcon = FaCog as unknown as React.FC<React.SVGProps<SVGSVGElement>>;
 const FaSignOutIcon = FaSignOutAlt as unknown as React.FC<React.SVGProps<SVGSVGElement>>;
 
-const Sidebar: React.FC = () => {
+interface SideProps {
+    active: boolean
+}
+
+const Sidebar: React.FC<SideProps> = ({active}) => {
     const handleLogout = async (): Promise<void> => {
         try {
           window.location.href = 'http://localhost:3700/auth/logout';
@@ -32,6 +36,7 @@ const Sidebar: React.FC = () => {
       <Nav.Link className="text-white" style={{width: '100%', display: 'flex', alignItems:'center', marginLeft: 'auto'}}><FaChartBarIcon className="me-2" /> Analytics</Nav.Link>
       <Nav.Link className="text-white" style={{width: '100%', display: 'flex', alignItems:'center', marginLeft: 'auto'}}><FaCogIcon className="me-2" /> Settings</Nav.Link>
       <Nav.Link onClick={handleLogout} className="text-white" style={{width: '100%', display: 'flex', alignItems:'center', marginLeft: 'auto'}}><FaSignOutIcon className="me-2" /> Logout</Nav.Link>
+      {active && <h4>Online</h4>}  
     </Nav>
   );
 };
