@@ -18,7 +18,7 @@ const YouMightKnow: React.FC = () => {
           {suggested.map((user, index) => (
             <ListGroup.Item key={index} className="d-flex align-items-center">
               <Image src={user.img} roundedCircle width={40} className="me-3" />
-              <div className="d-flex flex-column align-items-start">
+              <div style={{color: ' #a303a0'}} className="d-flex flex-column align-items-start">
                 <strong>{user.name}</strong>
                 <div className="text-muted" style={{ fontSize: '0.85rem' }}>{user.email}</div>
               </div>
