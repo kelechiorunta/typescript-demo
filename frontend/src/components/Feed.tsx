@@ -7,7 +7,7 @@ const FaCommentIcon = FaComment as unknown as React.FC<React.SVGProps<SVGSVGElem
 
 const Feed: React.FC = () => {
     return (
-      <div style={{color: ' #a303a0', height: '590px', overflow: 'scroll'}}>
+      <div style={{color: ' #a303a0', height: 'auto', overflow: 'scroll'}}>
             {/* Tabs */}
     <Card style={{color: ' #a303a0'}} className="mb-3 shadow-sm">
       <Nav style={{color: ' #a303a0'}} variant="tabs" defaultActiveKey="posts" className="mb-3">
