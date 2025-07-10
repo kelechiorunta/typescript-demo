@@ -5,17 +5,24 @@ import { GraphQLContext } from "./types/types";
 
 const resolvers = {
     Query: {
-        users: async (_: any, args: any, context: any) => {
+        otherClients: async (_: any, args: any, context: any) => {
             if (!context?.user) return [];
-  
+      
             try {
-                return context.user
-          
+              const users = await User.find({ _id: { $ne: context.user._id } });
+                return users
+            //   const enhancedUsers = users.map((user) => {
+            //     const userObj = user.toObject();
+            //     userObj.unreadCounts = formatUnreadCounts(user.unreadCounts);
+            //     return userObj;
+            //   });
+      
+            //   return enhancedUsers;
             } catch (error) {
-                console.error(error);
-                throw new Error("Failed to fetch users");
+              console.error(error);
+              throw new Error("Failed to fetch users");
             }
-        },
+          },
   
         auth: async (_: any, args: any, context: any) => {
             if (!context?.user) return null;
