@@ -14,11 +14,13 @@ interface UserContentProps {
     storedUser: AuthContextType;
     clients: AuthContextType[];
     onlineUsers: any;
+    data: any;
+    loading: boolean;
     setCurrentUser: React.Dispatch<React.SetStateAction<AuthContextType>>
 }
 
 
-const UserContent: React.FC<UserContentProps> = ({onlineUsers, clients, storedUser, authUser, currentUser, setCurrentUser }) => {
+const UserContent: React.FC<UserContentProps> = ({data, loading, onlineUsers, clients, storedUser, authUser, currentUser, setCurrentUser }) => {
 //   const [currentUser, setCurrentUser] = useState(authUser);
 
   return (
@@ -37,7 +39,7 @@ const UserContent: React.FC<UserContentProps> = ({onlineUsers, clients, storedUs
           <Feed />
         </Col>
         <Col xs={12} md={12} lg={4}>
-          <OtherClients onlineUsers={onlineUsers} clients={clients} />
+          <OtherClients data={data} loading={loading} onlineUsers={onlineUsers} clients={clients} />
         </Col>
       </Row>
     </div>

@@ -7,13 +7,15 @@ import { AuthContextType } from './VisitorClient';
 interface OtherClientsProps {
     clients: AuthContextType[];
     onlineUsers: any;
+    data: any;
+    loading: boolean
 }
 
-const OtherClients: React.FC<OtherClientsProps> = ({onlineUsers, clients}) => {
+const OtherClients: React.FC<OtherClientsProps> = ({data, loading, onlineUsers, clients}) => {
   return (
     <Stack gap={3}>
       <YouMightKnow />
-      <ActiveUsers onlineUsers={onlineUsers} clients={clients} />
+      <ActiveUsers data={data} loading={loading} onlineUsers={onlineUsers} clients={clients} />
     </Stack>
   );
 };

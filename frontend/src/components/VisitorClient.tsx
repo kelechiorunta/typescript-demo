@@ -61,7 +61,7 @@ const VisitorClient: React.FC = () => {
   useEffect(() => {
     if (!socket || !currentUser) return;
 
-    socket.emit('authenticated', { userId: currentUser?._id });
+    socket.emit('authenticated', { userId: storedCurrentUser?._id });
 
     socket.on('userOnline', ({ userId, online }: { userId: any; online: boolean }) => {
       setOnlineUsers((prev: any) => new Set(prev).add(userId));
@@ -90,22 +90,6 @@ const VisitorClient: React.FC = () => {
         </Col>
 
         <Col xs={12} md={9} lg={10}>
-          {loading ? (
-            <div className="p-4">
-              <Placeholder as="p" animation="glow">
-                <Placeholder xs={8} />
-              </Placeholder>
-              <Placeholder as="p" animation="glow">
-                <Placeholder xs={6} /> <Placeholder xs={4} />
-              </Placeholder>
-              <Placeholder as="p" animation="glow">
-                <Placeholder xs={12} />
-              </Placeholder>
-              <div className="d-flex justify-content-center mt-4">
-                <Spinner animation="border" variant="warning" />
-              </div>
-            </div>
-          ) : (
             <UserContent
               storedUser={storedCurrentUser}
               authUser={currentUser}
@@ -113,8 +97,9 @@ const VisitorClient: React.FC = () => {
               setCurrentUser={setCurrentUser}
               onlineUsers={onlineUsers}
               clients={clients}
+              data={data}
+              loading={loading}
             />
-          )}
         </Col>
       </Row>
     </Container>
