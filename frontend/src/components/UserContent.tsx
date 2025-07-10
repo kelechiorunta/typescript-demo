@@ -12,11 +12,13 @@ interface UserContentProps {
     authUser: AuthContextType;
     currentUser: AuthContextType;
     storedUser: AuthContextType;
+    clients: AuthContextType[];
+    onlineUsers: any;
     setCurrentUser: React.Dispatch<React.SetStateAction<AuthContextType>>
 }
 
 
-const UserContent: React.FC<UserContentProps> = ({ storedUser, authUser, currentUser, setCurrentUser }) => {
+const UserContent: React.FC<UserContentProps> = ({onlineUsers, clients, storedUser, authUser, currentUser, setCurrentUser }) => {
 //   const [currentUser, setCurrentUser] = useState(authUser);
 
   return (
@@ -27,7 +29,7 @@ const UserContent: React.FC<UserContentProps> = ({ storedUser, authUser, current
       {/* Profile Header */}
       <ProfileHeader storedUser={storedUser} authUser={authUser} currentUser={currentUser} setCurrentUser={setCurrentUser} />
 
-      <Row style={{ color: '#a303a0', height: '570px', overflow: 'hidden' }} className="gx-2">
+      <Row style={{ color: '#a303a0', height: 'max-content', overflow: 'auto' }} className="gx-2">
         <Col xs={12} md={6} lg={4}>
           <About authUser={authUser} currentUser={currentUser} />
         </Col>
@@ -35,7 +37,7 @@ const UserContent: React.FC<UserContentProps> = ({ storedUser, authUser, current
           <Feed />
         </Col>
         <Col xs={12} md={12} lg={4}>
-          <OtherClients />
+          <OtherClients onlineUsers={onlineUsers} clients={clients} />
         </Col>
       </Row>
     </div>
