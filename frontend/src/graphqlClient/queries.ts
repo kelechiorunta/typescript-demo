@@ -15,6 +15,7 @@ export const AUTH = gql`
       isOnline
       gender
       backgroundImage
+      videoId
   }
 }
 `;
@@ -33,6 +34,7 @@ export const GET_OTHER_CLIENTS = gql`
       lastMessage
       lastMessageCount
       isOnline
+      videoId
   }
 }
 `;
@@ -48,6 +50,7 @@ export const GET_CLIENTS = gql`
       gender
       phone
       backgroundImage
+      videoId
     }
   }
 `;
@@ -62,7 +65,14 @@ export const GET_FILTERED_CLIENT = gql`
       gender
       phone
       backgroundImage
+      videoId
     }
+  }
+`;
+
+export const GET_VIDEO = gql`
+  query GetVideo($email: String!) {
+    getVideo(email: $email)
   }
 `;
 
