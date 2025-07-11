@@ -17,6 +17,7 @@ import { createServer } from 'http';
 dotenv.config();
 import authRouter from './authRouter';
 import videoRouter from './videoRouter';
+import picRouter from './pictureRouter';
 import { connectDB } from './db';
 import resolvers from './resolvers';
 import User from './models/User';
@@ -101,8 +102,11 @@ app.use(passport.session())
 // Setup auth routes
 app.use('/auth', authRouter);
 
-// Setup auth routes
+// Setup video routes
 app.use('/api', videoRouter);
+
+// Setup picture routes
+app.use('/pic', picRouter);
 
 // Setup graphql transport layer graphqlHTTP
 
