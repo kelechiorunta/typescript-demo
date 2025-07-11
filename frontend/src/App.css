@@ -41,3 +41,29 @@
     transform: rotate(360deg);
   }
 }
+
+/* Add this to your CSS file */
+.spinner-border {
+  border-top-color: transparent;
+  border-right-color: currentColor;
+  border-bottom-color: currentColor;
+  border-left-color: currentColor;
+  border-style: solid;
+  border-width: 0.25rem;
+  border-radius: 9999px;
+  width: 2rem;
+  height: 2rem;
+  animation: spin 0.75s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.modal-style{
+  font-family: "Raleway", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
