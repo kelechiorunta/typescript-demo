@@ -91,6 +91,18 @@ query GetBackgroundImageIds($email: String!) {
     }
   }`
   
+export const SET_BACKGROUND_IMAGE = gql`
+    mutation SetBackgroundImage($email: String!) {
+      setBackgroundImage(email: $email) {
+        backgroundImage
+        backgroundPlaceholder
+        backgroundImageId
+        backgroundPlaceholderId
+        id
+      }
+    }
+  `;
+  
 export const SET_PROFILE_BACKGROUND = gql`
   mutation UpdateProfileBackground($username: String!, $backgroundImage: String!) {
     updateProfileBackground(username: $username, backgroundImage: $backgroundImage) {

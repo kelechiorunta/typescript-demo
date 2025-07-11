@@ -101,22 +101,12 @@
 // EditBackgroundProfile.tsx
 import React, { useState } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
-import { useMutation, useLazyQuery, gql } from '@apollo/client';
+import { useMutation, useLazyQuery } from '@apollo/client';
 
 import { AuthContextType } from './VisitorClient';
-import { GET_BACKGROUND_IDS } from '../graphqlClient/queries';
+import { GET_BACKGROUND_IDS, SET_BACKGROUND_IMAGE } from '../graphqlClient/queries';
 
-const SET_BACKGROUND_IMAGE = gql`
-  mutation SetBackgroundImage($email: String!) {
-    setBackgroundImage(email: $email) {
-      backgroundImage
-      backgroundPlaceholder
-      backgroundImageId
-      backgroundPlaceholderId
-      id
-    }
-  }
-`;
+
 interface Props {
   show: boolean;
   handleClose: () => void;
