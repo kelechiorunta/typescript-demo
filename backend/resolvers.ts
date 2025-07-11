@@ -1,7 +1,8 @@
 import User from "./models/User";
 import { getUsers } from "./server";
 import { GraphQLContext } from "./types/types";
-
+import { GridFSBucket, ObjectId, Db } from 'mongodb';
+import mongoose from "mongoose";
 
 const resolvers = {
     Query: {
@@ -64,7 +65,17 @@ const resolvers = {
                 } catch (err) {
                   console.error("Failed to fetch users:", err);
                 }
-              }
+        },
+        
+        getBackgroundImageIds: async (_: any, { email }: { email: string }) => {
+            const user = await User.findOne({ email });
+            if (!user) throw new Error('User not found');
+          
+            return {
+              backgroundImageId: user.backgroundImageId?.toString() || null,
+              backgroundPlaceholderId: user.backgroundPlaceholderId?.toString() || null,
+            };
+          }
     },
 
     Mutation: {
@@ -85,6 +96,27 @@ const resolvers = {
     
           return user;
         },
+        
+        setBackgroundImage: async (_: any, { email }: { email: string }) => {
+
+            const db: Db | any = mongoose.connection.db
+            const gfs = new GridFSBucket(db, {
+              bucketName: 'backgroundImages',
+            });
+      
+            const user = await User.findOne({ email });
+            if (!user || !user.backgroundImageId || !user.backgroundPlaceholderId) {
+              throw new Error('User or images not found');
+            }
+      
+            const imageUrl = `http://localhost:3700/pic/images/${user.backgroundImageId}`;
+            const placeholderUrl = `http://localhost:3700/pic/images/${user.backgroundPlaceholderId}`;
+      
+            return {
+              backgroundImage: imageUrl,
+              backgroundPlaceholder: placeholderUrl,
+            };
+          },
 
         sendMessage: async (_: any, { content }: {content: any}, { req }: {req: any}) => {
             const io = req.app.get('io'); // get io instance from Express
