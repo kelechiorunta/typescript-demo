@@ -18,7 +18,9 @@ export type AuthContextType = {
   gender: string;
   backgroundImage: string;
   isOnline: boolean;
-  videoId: any
+  videoId: any;
+  backgroundImageId: any;
+  backgroundPlaceholderId: any;
 };
 
 const VisitorClient: React.FC = () => {
@@ -49,7 +51,7 @@ const VisitorClient: React.FC = () => {
       console.log('Connected to socket.io server');
     });
 
-    socketInstance.on('newMessage', (user) => {
+    socketInstance.on('newMessage', (user: any) => {
       console.log('Received new user:', user?.username);
     });
 
