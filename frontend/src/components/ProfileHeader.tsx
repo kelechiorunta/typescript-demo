@@ -5,6 +5,7 @@ import { FaSearch, FaEnvelope, FaUserPlus } from 'react-icons/fa';
 import TopBar from './TopBar';
 import { AuthContextType } from './VisitorClient';
 import EditBackgroundProfile from './EditBackgroundProfile';
+import BlurLoadBackgroundImage from './BlurLoadBackgroundImage';
 
 interface ProfileContextProps {
     authUser: AuthContextType
@@ -21,11 +22,16 @@ const ProfileHeader: React.FC<ProfileContextProps> = ({ storedUser, authUser, cu
     const [showModal, setShowModal] = useState(false);
     // const [user, setUser] = useState(currentUser); // Local copy to pass down
   return (
-    <Card className="mb-4 bg-[ #ffffff]">
-        <Card.Img variant="top" src={currentUser?.backgroundImage || './suit.png'} style={{ minHeight: '40vh', maxHeight:'50vh', backgroundSize: 'cover', backgroundPosition: 'center'}}/>
+      <Card className="mb-4 bg-[ #ffffff]">
+        <BlurLoadBackgroundImage
+            fullImageUrl={`http://localhost:3700/pic/images/${currentUser?.backgroundImageId}`}
+            placeholderImageUrl={`http://localhost:3700/pic/images/${currentUser?.backgroundPlaceholderId}`}
+        />
+
+        {/* <Card.Img variant="top" src={currentUser?.backgroundImage || './suit.png'} style={{ minHeight: '40vh', maxHeight:'50vh', backgroundSize: 'cover', backgroundPosition: 'center'}}/> */}
         <Card.Body className="d-flex flex-column align-items-center relative bg-[ #ffffff] ">
             <Image
-                style={{position: 'absolute', bottom: '20%', left: '3%'}}     
+                style={{position: 'absolute', bottom: '20%', left: '3%', zIndex:50}}     
                 // src="https://randomuser.me/api/portraits/men/75.jpg"
                 src={currentUser?.picture || './backgroundII.png'}
                 roundedCircle width={100} height={100}
@@ -33,7 +39,7 @@ const ProfileHeader: React.FC<ProfileContextProps> = ({ storedUser, authUser, cu
                 {currentUser?.username === storedUser?.username && (
                 <div className="d-flex gap-3 mt-3 text-[ #a303a0]">
                     <Button
-                    style={{ position: 'absolute', bottom: '50%', right: '1%', color: ' #a303a0', outline: '1px solid  #a303a0', backgroundColor: 'white' }}
+                    style={{zIndex:50, position: 'absolute', bottom: '50%', right: '1%', color: ' #a303a0', outline: '1px solid  #a303a0', backgroundColor: 'white' }}
                     onClick={() => setShowModal(true)}
                     >
                     Edit Cover Photo
@@ -46,6 +52,7 @@ const ProfileHeader: React.FC<ProfileContextProps> = ({ storedUser, authUser, cu
                 handleClose={() => setShowModal(false)}
                 currentUser={currentUser}
                 setCurrentUser={setCurrentUser}
+                storedUser={storedUser}
                 />
                   
              <div style={{width: '100%', color: ' #a303a0'}} className='d-flex justify-content-between align-items-center'>
