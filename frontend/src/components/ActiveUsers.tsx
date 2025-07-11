@@ -102,12 +102,14 @@ const ActiveUsers: React.FC<ActiveUsersProps> = ({
             style={{ height: '49vh', overflowY: 'scroll', color: '#a303a0' }}
             variant="flush"
           >
-            {data.otherClients.length > 0 &&
-              data.otherClients.map((user: AuthContextType, index: number) => (
+          {data.otherClients.length > 0 &&
+            data.otherClients.filter((client: any) => (onlineUsers?.has(client._id) || client.picture)).map((user: AuthContextType, index: number) => (
                 <ListGroup.Item
                   key={index}
                   className="d-flex align-items-center justify-content-between"
-                >
+                  >
+                 {/* {(onlineUsers?.has(user._id) || user.picture) && */}
+                {/* <> */}
                   <div className="d-flex align-items-center">
                     <Image
                       src={user?.picture || './profile.png'}
@@ -128,12 +130,15 @@ const ActiveUsers: React.FC<ActiveUsersProps> = ({
                         {user?.email}
                       </span>
                     </div>
-                  </div>
-                  {onlineUsers?.has(user._id) ? (
+                    </div>
+                    {/* <Badge bg={'success'}>Online</Badge> */}
+                {/* </> */}
+                {onlineUsers?.has(user._id) ? (
                     <Badge bg={'success'}>Online</Badge>
-                  ) : (
+                 ) : (
                     <Badge bg={'warning'}>Offline</Badge>
-                  )}
+                )}
+                    {/* } */}
                 </ListGroup.Item>
               ))}
           </ListGroup>
