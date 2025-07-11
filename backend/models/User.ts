@@ -2,7 +2,7 @@ import mongoose, { Document } from 'mongoose';
 import bcrypt from 'bcrypt';
 import validator from 'validator';
 
-interface IUser extends Document {
+export interface IUser extends Document {
     username: string,
     email: string,
     password: any,
@@ -24,12 +24,16 @@ interface IUser extends Document {
     gender: string,
     backgroundImage: string
     videoId?: mongoose.Types.ObjectId;
+    backgroundImageId?: mongoose.Types.ObjectId;
+    backgroundPlaceholderId?: mongoose.Types.ObjectId;
 }
 
 const userSchema = new mongoose.Schema<IUser>({
     username: { type: String, required: false, default: 'Anonymous User'  },
     email: { type: String, required: false, validate: validator.isEmail },
     videoId: { type: mongoose.Schema.Types.ObjectId, required: false },
+    backgroundImageId: { type: mongoose.Schema.Types.ObjectId, required: false },
+    backgroundPlaceholderId: { type: mongoose.Schema.Types.ObjectId, required: false },
     password: { type: String, required: false },
     createdAt: { type: Date, default: Date.now },
     picture: { type: String, required: false, default: '' },
