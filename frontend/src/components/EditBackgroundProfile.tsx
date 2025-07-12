@@ -112,10 +112,12 @@ interface Props {
   handleClose: () => void;
   currentUser: any;
   storedUser: AuthContextType;
+  profileUser: AuthContextType;
   setCurrentUser: (user: any) => void;
+  setProfileUser: (user: any) => void;
 }
 
-const EditBackgroundProfile: React.FC<Props> = ({ show, handleClose, storedUser, currentUser, setCurrentUser }) => {
+const EditBackgroundProfile: React.FC<Props> = ({ show, handleClose, profileUser, setProfileUser, storedUser, currentUser, setCurrentUser }) => {
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
     const [setBackgroundImage] = useMutation(SET_BACKGROUND_IMAGE);
@@ -137,7 +139,7 @@ const [getBackgroundImageIds] = useLazyQuery(GET_BACKGROUND_IDS);
 
     try {
       // Upload image to REST endpoint
-      await fetch(`http://localhost:3700/pic/background/${currentUser.email}`, {
+      await fetch(`http://localhost:3700/pic/background/${profileUser.email}`, {
         method: 'POST',
         credentials: 'include',
         body: formData,
@@ -147,7 +149,7 @@ const [getBackgroundImageIds] = useLazyQuery(GET_BACKGROUND_IDS);
       const { data } = await setBackgroundImage({ variables: { email: storedUser.email } });
 
       if (data?.setBackgroundImage) {
-        setCurrentUser((prev: any) => ({
+        setProfileUser((prev: any) => ({
           ...prev,
             backgroundImage: data.setBackgroundImage.backgroundImage,
             backgroundPlaceholder: data.setBackgroundImage.backgroundPlaceholder,
@@ -159,7 +161,7 @@ const [getBackgroundImageIds] = useLazyQuery(GET_BACKGROUND_IDS);
       const { data: idData } = await getBackgroundImageIds({ variables: { email: storedUser.email } });
 
       if (idData?.getBackgroundImageIds) {
-        setCurrentUser((prev: any) => ({
+        setProfileUser((prev: any) => ({
           ...prev,
           backgroundImage: `http://localhost:3700/pic/images/${idData.getBackgroundImageIds.backgroundImageId}`,
           backgroundPlaceholder: `http://localhost:3700/pic/images/${idData.getBackgroundImageIds.backgroundPlaceholderId}`,
