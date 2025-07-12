@@ -1,6 +1,6 @@
 // components/Sidebar.tsx
 import React from 'react';
-import { Nav } from 'react-bootstrap';
+import { Nav, Image } from 'react-bootstrap';
 import { FaHome, FaUser, FaEnvelope, FaBox, FaImages, FaChartBar, FaCog, FaSignOutAlt } from 'react-icons/fa';
 
 const FaHomeIcon = FaHome as unknown as React.FC<React.SVGProps<SVGSVGElement>>;
@@ -26,7 +26,7 @@ const Sidebar: React.FC<SideProps> = ({active}) => {
       };
   return (
     <Nav className="flex-column bg-[ #490057] text-white vh-100 p-3 sticky-top" style={{ minWidth: '200px', backgroundColor: ' #490057' }}>
-          <h4 className="text-white mb-4" style={{ width: '100%', textAlign: 'left', paddingLeft:20 }}>3MM</h4>
+          <h4 className="text-white mb-4" style={{ width: '100%', textAlign: 'left', paddingLeft: 20 }}><Image src={'./Logo.png'} width={50} height={50} alt='' /> 3MM</h4>
       <Nav.Link className="text-white" style={{width: '100%', display: 'flex', alignItems:'center', marginLeft: 'auto'}}><FaHomeIcon className="me-2" /> Home</Nav.Link>
       <Nav.Link className="text-warning" style={{width: '100%', display: 'flex', alignItems:'center', marginLeft: 'auto'}}><FaUserIcon className="me-2" /> Profile</Nav.Link>
       <Nav.Link className="text-white" style={{width: '100%', display: 'flex', alignItems:'center', marginLeft: 'auto'}}><FaEnvelopeIcon className="me-2" /> Messages</Nav.Link>
@@ -36,7 +36,7 @@ const Sidebar: React.FC<SideProps> = ({active}) => {
       <Nav.Link className="text-white" style={{width: '100%', display: 'flex', alignItems:'center', marginLeft: 'auto'}}><FaChartBarIcon className="me-2" /> Analytics</Nav.Link>
       <Nav.Link className="text-white" style={{width: '100%', display: 'flex', alignItems:'center', marginLeft: 'auto'}}><FaCogIcon className="me-2" /> Settings</Nav.Link>
       <Nav.Link onClick={handleLogout} className="text-white" style={{width: '100%', display: 'flex', alignItems:'center', marginLeft: 'auto'}}><FaSignOutIcon className="me-2" /> Logout</Nav.Link>
-      {active && <h4>Online</h4>}  
+      {/* {active && <h4>Online</h4>}   */}
     </Nav>
   );
 };

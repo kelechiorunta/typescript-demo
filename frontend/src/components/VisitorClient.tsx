@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Placeholder, Spinner } from 'react-bootstrap';
 import { useOutletContext } from 'react-router-dom';
-import { io } from 'socket.io-client';
+import io  from 'socket.io-client';
 
 import Sidebar from './Sidebar';
 import UserContent from './UserContent';
@@ -13,20 +13,25 @@ export type AuthContextType = {
   _id: any;
   username: string;
   email: string;
+  address: string;
   picture: string;
   phone: string;
   gender: string;
+  birthday: string;
   backgroundImage: string;
   isOnline: boolean;
   videoId: any;
   backgroundImageId: any;
   backgroundPlaceholderId: any;
+  occupation: string;
 };
 
 const VisitorClient: React.FC = () => {
   const authUser = useOutletContext<AuthContextType>();
   const storedCurrentUser = authUser;
-  const [currentUser, setCurrentUser] = useState<AuthContextType>(() => ({ ...authUser }));
+  const [currentUser, setCurrentUser] = useState<AuthContextType>(authUser);
+//   const [currentUser, setCurrentUser] = useState<AuthContextType>(() => ({ ...authUser }));
+  const [profileUser, setProfileUser] = useState<AuthContextType>(() => ({ ...storedCurrentUser }));
   const { data, loading, error } = useQuery(GET_OTHER_CLIENTS);
 
   const [socket, setSocket] = useState<any>(null);
@@ -38,11 +43,10 @@ const VisitorClient: React.FC = () => {
     const socketServerURL = 'http://localhost:3700';
     const socketInstance = io(socketServerURL, {
       transports: ['websocket'],
-      extraHeaders: {
-        Authorization: 'Bearer YOUR_TOKEN_HERE',
-        'Content-Type': 'application/json',
-      },
-      withCredentials: true,
+    //   extraHeaders: {
+    //     Authorization: 'Bearer YOUR_TOKEN_HERE',
+    //     'Content-Type': 'application/json',
+    //   },
     });
 
     setSocket(socketInstance);
@@ -98,6 +102,8 @@ const VisitorClient: React.FC = () => {
               authUser={currentUser}
               currentUser={currentUser}
               setCurrentUser={setCurrentUser}
+              profileUser={profileUser}
+              setProfileUser={setProfileUser}
               onlineUsers={onlineUsers}
               clients={clients}
               data={data}
