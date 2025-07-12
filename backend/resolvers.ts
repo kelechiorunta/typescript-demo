@@ -75,6 +75,10 @@ const resolvers = {
               backgroundImageId: user.backgroundImageId?.toString() || null,
               backgroundPlaceholderId: user.backgroundPlaceholderId?.toString() || null,
             };
+        },
+        getProfile: async (_parent: any, _args: any, context: any) => {
+            if (!context.user) throw new Error('Unauthorized');
+            return await User.findById(context.user.id);
           }
     },
 
@@ -96,6 +100,19 @@ const resolvers = {
     
           return user;
         },
+
+        updateProfile: async (_parent: any, { userInputs }: { userInputs: any}, context: any) => {
+            const userId = context.user?.id;
+            if (!userId) throw new Error('Unauthorized');
+      
+            const updatedUser = await User.findByIdAndUpdate(
+              userId,
+              { $set: userInputs },
+              { new: true }
+            );
+      
+            return updatedUser;
+          },
         
         setBackgroundImage: async (_: any, { email }: { email: string }) => {
 
