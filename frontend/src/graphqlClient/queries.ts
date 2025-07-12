@@ -18,6 +18,9 @@ export const AUTH = gql`
       videoId
       backgroundImageId
       backgroundPlaceholderId
+      occupation
+      address
+      birthday
   }
 }
 `;
@@ -39,6 +42,9 @@ export const GET_OTHER_CLIENTS = gql`
       videoId
       backgroundImageId
       backgroundPlaceholderId
+      occupation
+      address
+      birthday
   }
 }
 `;
@@ -57,6 +63,9 @@ export const GET_CLIENTS = gql`
       videoId
       backgroundImageId
       backgroundPlaceholderId
+      occupation
+      address
+      birthday
     }
   }
 `;
@@ -74,6 +83,9 @@ export const GET_FILTERED_CLIENT = gql`
       videoId
       backgroundImageId
       backgroundPlaceholderId
+      occupation
+      address
+      birthday
     }
   }
 `;
@@ -83,6 +95,7 @@ export const GET_VIDEO = gql`
     getVideo(email: $email)
   }
 `;
+
 export const GET_BACKGROUND_IDS = gql`
 query GetBackgroundImageIds($email: String!) {
     getBackgroundImageIds(email: $email) {
@@ -90,6 +103,21 @@ query GetBackgroundImageIds($email: String!) {
       backgroundPlaceholderId
     }
   }`
+
+  export const GET_PROFILE = gql`
+  query GetProfile {
+    getProfile {
+      username
+      email
+      birthday
+      gender
+      phone
+      address
+      occupation
+      picture
+    }
+  }
+`;
   
 export const SET_BACKGROUND_IMAGE = gql`
     mutation SetBackgroundImage($email: String!) {
@@ -108,6 +136,22 @@ export const SET_PROFILE_BACKGROUND = gql`
     updateProfileBackground(username: $username, backgroundImage: $backgroundImage) {
       username
       backgroundImage
+    }
+  }
+`;
+
+export const UPDATE_PROFILE = gql`
+  mutation UpdateProfile($userInputs: UserUpdateInput!) {
+    updateProfile(userInputs: $userInputs) {
+      _id
+      username
+      email
+      picture
+      birthday
+      occupation
+      gender
+      phone
+      address
     }
   }
 `;
