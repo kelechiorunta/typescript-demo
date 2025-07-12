@@ -20,12 +20,14 @@ export interface IUser extends Document {
     google: any,
     image: string,
     phone: string,
-    birthdate: string,
+    birthday: string,
     gender: string,
-    backgroundImage: string
-    videoId?: mongoose.Types.ObjectId;
-    backgroundImageId?: mongoose.Types.ObjectId;
-    backgroundPlaceholderId?: mongoose.Types.ObjectId;
+    backgroundImage: string,
+    address: string,
+    occupation: string,
+    videoId?: mongoose.Types.ObjectId,
+    backgroundImageId?: mongoose.Types.ObjectId,
+    backgroundPlaceholderId?: mongoose.Types.ObjectId,
 }
 
 const userSchema = new mongoose.Schema<IUser>({
@@ -38,7 +40,9 @@ const userSchema = new mongoose.Schema<IUser>({
     createdAt: { type: Date, default: Date.now },
     picture: { type: String, required: false, default: '' },
     image: { type: String, required: false, default: '' },
-    birthdate: { type: String, required: false, default: '' },
+    birthday: { type: String, required: false, default: '' },
+    occupation: { type: String, required: false, default: '' },
+    address: { type: String, required: false, default: '' },
     gender: { type: String, required: false, default: 'Male' },
     phone: { type: String, required: false, default: '' },
     lastMessage: { type: String, required: false, default: '' },
