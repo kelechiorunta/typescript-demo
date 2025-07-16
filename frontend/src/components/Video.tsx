@@ -7,7 +7,6 @@ interface VideoProps {
   email: string;
 }
 
-
 const Video: React.FC<VideoProps> = ({ email }) => {
     const { data, loading, error } = useQuery(GET_VIDEO, {
     // fetchPolicy: 'cache-only',
