@@ -8,7 +8,7 @@ import {
   Spinner,
 } from 'react-bootstrap';
 
-import { AuthContextType } from './VisitorClient';
+import { AuthContextType } from '../App';
 
 interface ActiveUsersProps {
   clients: AuthContextType[];
