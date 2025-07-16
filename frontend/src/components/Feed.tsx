@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, Nav, Placeholder } from 'react-bootstrap';
 import Post from './Post';
-import { AuthContextType } from './VisitorClient';
+import { AuthContextType } from '../App';
 
 interface FeedProps {
   clients: AuthContextType[];
