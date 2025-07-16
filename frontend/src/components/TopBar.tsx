@@ -5,7 +5,8 @@ import { Formik, Form as FormikForm, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { Form, Button, Card, Image, Row, Col, InputGroup } from 'react-bootstrap';
 import { FaSearch } from 'react-icons/fa';
-import { AuthContextType } from './VisitorClient';
+import { AuthContextType } from '../App';
+import { useUserContext } from './UserContext';
 
 interface UserContextProps {
   authUser: AuthContextType;
@@ -19,16 +20,14 @@ interface TopBarProps {
 const FaSearchIcon = FaSearch as unknown as React.FC<React.SVGProps<SVGSVGElement>>;
 
 const TopBar: React.FC<TopBarProps> = ({ authUser, setCurrentUser, currentUser }) => {
+    const { profileUser, setProfileUser } = useUserContext();
  
   const [getFilteredClients, { data, loading, error }] = useLazyQuery(GET_FILTERED_CLIENT, {
     fetchPolicy: 'network-only',
     onCompleted: (res) => {
       if (res?.filteredClients?.length > 0) {
           setCurrentUser(res.filteredClients[0]);
-        //   alert('User found');
-        // } else {
-        //   alert('No user found');
-        
+          setProfileUser(res.filteredClients[0]);
         }
     },
   });
