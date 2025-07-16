@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, Image } from 'react-bootstrap';
 import { FaHeart, FaComment } from 'react-icons/fa';
 import Video from './Video';
-import { AuthContextType } from './VisitorClient';
+import { AuthContextType } from '../App';
 
 interface PostProps {
   author: string;
@@ -33,7 +33,7 @@ const Post: React.FC<PostProps> = ({
   return (
       <div style={{maxHeight: '500px', overflow: 'scroll'}}>
           
-      <div className="d-flex align-items-center mb-3 relative">
+      <div className="d-flex align-items-start mb-3 relative">
         <Image
                   
           src={avatarUrl || './profile.png'}
@@ -44,9 +44,9 @@ const Post: React.FC<PostProps> = ({
           alt="Avatar"
         />
          
-        <div>
+        <div className='d-flex flex-column justify-items-start'>
           <strong>{author}</strong>
-          <div className="text-muted" style={{ fontSize: '0.85rem' }}>{timestamp}</div>
+          <div className="text-muted" style={{ fontSize: '0.85rem', width: 'auto', textAlign: 'left' }}>{timestamp}</div>
         </div>
       </div>
 
