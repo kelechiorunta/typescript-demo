@@ -96,7 +96,7 @@ const ChatBody: React.FC<ChatBodyProps> = ({ messages, messageLoading, messageEr
         return format(parsedDate, 'MMMM d, yyyy');
       };
     
-    let lastMessageDate: any;
+    let lastMessageDate: any = null;
   
     const renderSkeletons = () =>
     Array.from({ length: 5 }).map((_, idx) => (
@@ -111,26 +111,25 @@ const ChatBody: React.FC<ChatBodyProps> = ({ messages, messageLoading, messageEr
 
   const renderMessages = () =>
     messages.map((msg) => {
-        const isSender = msg.sender._id === currentUserId;
+        const isSender = msg.sender?._id === currentUserId;
         const msgDate = msg.createdAt;
         const dateLabel = typeof msgDate !== 'string' ?
-            formatDateLabel(parseFloat(msg.createdAt))
-            :
             formatDateLabel((msg.createdAt))
-      ;
+            :
+            formatDateLabel(parseInt(msg.createdAt))
+            ;
+        lastMessageDate = msgDate
 
-      const showDateLabel =
-          !lastMessageDate || formatDateLabel(lastMessageDate) !== dateLabel;
-      lastMessageDate = msgDate
-
+      const showDateLabel = !lastMessageDate || formatDateLabel(lastMessageDate) !== dateLabel;
+      
         return (
           
       <React.Fragment>
-        {dateLabel && (
+        {showDateLabel && (
             <div className="text-center my-3" style={{ fontSize: '0.8rem' }}>
                 <div style={{ display: 'flex', justifyContent:'space-evenly', width: '100%', alignItems: 'center' }}>
                     <hr style={{ width: '100%' }} />
-                    <p style={{ width: '100%', marginTop: 15 }}>{formatDateLabel(parseFloat(msg.createdAt))} </p>
+                    <p style={{ width: '100%', marginTop: 15 }}>{dateLabel} </p>
                     <hr style={{ width: '100%' }} />
                 </div>
             </div>
@@ -151,14 +150,14 @@ const ChatBody: React.FC<ChatBodyProps> = ({ messages, messageLoading, messageEr
 
           <div
             className={`p-2 px-3 rounded-3 shadow-sm ${
-              isSender ? 'bg-primary text-white' : 'bg-light text-dark'
+              isSender ? 'bg-[ #a303a0] text-white' : 'bg-light text-dark'
             }`}
-            style={{ maxWidth: '70%' }}
+            style={{ maxWidth: '70%', backgroundColor: isSender?'  #a303a0' : 'white'}}
           >
             <div style={{ width: 'max-content', textAlign: isSender? 'left' : 'right' }} className={`small fw-bold mb-1 ${isSender? 'text-left' : 'text-right'} w-100 me-auto`}>{isSender ? 'You' : msg.sender.username}</div>
             <div>{msg.content}</div>
                 <div className="text-muted small text-end mt-1">
-                {msg.createdAt && formatDateLabel(parseFloat(msg.createdAt))}
+                {msg.createdAt && dateLabel}
             </div>
           </div>
 
