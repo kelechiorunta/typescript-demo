@@ -1,155 +1,193 @@
-import User from "./models/User";
-import { getUsers } from "./server";
-import { GraphQLContext } from "./types/types";
+import ChatMessage from './models/ChatMessage';
+import Chat from './models/Chat';
+import User from './models/User';
+import { getUsers } from './server';
+import { GraphQLContext } from './types/types';
 import { GridFSBucket, ObjectId, Db } from 'mongodb';
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const resolvers = {
-    Query: {
-        otherClients: async (_: any, args: any, context: any) => {
-            if (!context?.user) return [];
-      
-            try {
-              const users = await User.find({ _id: { $ne: context.user._id } });
-                return users
-            } catch (error) {
-              console.error(error);
-              throw new Error("Failed to fetch users");
-            }
-          },
-  
-        auth: async (_: any, args: any, context: any) => {
-            if (!context?.user) return null;
-            return context.user
-        },
+  Query: {
+    otherClients: async (_: any, args: any, context: any) => {
+      if (!context?.user) return [];
 
-        getVideo: async (_:any, { email }: { email: string }, context: any) => {
-            // Make sure the token is verified here if needed
-            return `http://localhost:3700/api/videos/${email}`;
-        },
-
-        filteredClients: async (_: any, args: any, context: any) => {
-            if (!context.user) return null;
-          
-            const { id, username, email } = args.client || {};
-          
-            const query: any = {};
-          
-            if (id) query._id = id;
-            if (username) query.username = { $regex: username, $options: 'i' };
-            if (email) query.email = { $regex: email, $options: 'i' };
-          
-            try {
-              const filteredUsers = await User.find(query);
-              return filteredUsers;
-            } catch (err) {
-              console.error('Error fetching filtered clients:', err);
-              throw new Error('Failed to fetch filtered clients.');
-            }
-          },          
-
-        clients: async (_: any, args: any, context: any) => {
-            
-            // if (!context?.user) return null;
-            
-                try {
-                  const response = await fetch("https://dummyjson.com/users", {
-                    method: "GET",
-                    headers: {
-                      'Content-Type': 'application/json',
-                    },
-                    credentials: 'include'
-                  });
-                  const result = await response.json();
-                  return result?.users
-                } catch (err) {
-                  console.error("Failed to fetch users:", err);
-                }
-        },
-        
-        getBackgroundImageIds: async (_: any, { email }: { email: string }) => {
-            const user = await User.findOne({ email });
-            if (!user) throw new Error('User not found');
-          
-            return {
-              backgroundImageId: user.backgroundImageId?.toString() || null,
-              backgroundPlaceholderId: user.backgroundPlaceholderId?.toString() || null,
-            };
-        },
-        getProfile: async (_parent: any, _args: any, context: any) => {
-            if (!context.user) throw new Error('Unauthorized');
-            return await User.findById(context.user.id);
-          }
+      try {
+        const users = await User.find({ _id: { $ne: context.user._id } });
+        return users;
+      } catch (error) {
+        console.error(error);
+        throw new Error('Failed to fetch users');
+      }
     },
 
-    Mutation: {
-        updateProfileBackground: async (_: any, { username, backgroundImage }: { username: string, backgroundImage: string }, context: GraphQLContext) => {
-          const user = await User.findOneAndUpdate(
-            { username },
-            { backgroundImage },
-            { new: true } // return the updated document
-          );
-    
-          if (!user) {
-            throw new Error('User not found');
-          }
-            
-          const io = context.req.app.get('io'); // get socket.io instance
-    
-          io.emit('newMessage', user);
-    
-          return user;
-        },
+    auth: async (_: any, args: any, context: any) => {
+      if (!context?.user) return null;
+      return context.user;
+    },
 
-        updateProfile: async (_parent: any, { userInputs }: { userInputs: any}, context: any) => {
-            const userId = context.user?.id;
-            if (!userId) throw new Error('Unauthorized');
-      
-            const updatedUser = await User.findByIdAndUpdate(
-              userId,
-              { $set: userInputs },
-              { new: true }
-            );
-      
-            return updatedUser;
-          },
-        
-        setBackgroundImage: async (_: any, { email }: { email: string }) => {
+    getVideo: async (_: any, { email }: { email: string }, context: any) => {
+      // Make sure the token is verified here if needed
+      return `http://localhost:3700/api/videos/${email}`;
+    },
 
-            const db: Db | any = mongoose.connection.db
-            const gfs = new GridFSBucket(db, {
-              bucketName: 'backgroundImages',
-            });
-      
-            const user = await User.findOne({ email });
-            if (!user || !user.backgroundImageId || !user.backgroundPlaceholderId) {
-              throw new Error('User or images not found');
-            }
-      
-            const imageUrl = `http://localhost:3700/pic/images/${user.backgroundImageId}`;
-            const placeholderUrl = `http://localhost:3700/pic/images/${user.backgroundPlaceholderId}`;
-      
-            return {
-              backgroundImage: imageUrl,
-              backgroundPlaceholder: placeholderUrl,
-            };
-          },
+    filteredClients: async (_: any, args: any, context: any) => {
+      if (!context.user) return null;
 
-        sendMessage: async (_: any, { content }: {content: any}, { req }: {req: any}) => {
-            const io = req.app.get('io'); // get io instance from Express
-      
-            // Perform DB operations, etc...
-            const newMessage = {
-              id: Date.now().toString(),
-              content,
-              timestamp: new Date().toISOString(),
-            };
-      
-            io.emit('newMessage', newMessage); // 🔥 emit socket event
-      
-            return newMessage;
-          },
+      const { id, username, email } = args.client || {};
+
+      const query: any = {};
+
+      if (id) query._id = id;
+      if (username) query.username = { $regex: username, $options: 'i' };
+      if (email) query.email = { $regex: email, $options: 'i' };
+
+      try {
+        const filteredUsers = await User.find(query);
+        return filteredUsers;
+      } catch (err) {
+        console.error('Error fetching filtered clients:', err);
+        throw new Error('Failed to fetch filtered clients.');
       }
-}
+    },
 
-export default resolvers
+    clients: async (_: any, args: any, context: any) => {
+      // if (!context?.user) return null;
+
+      try {
+        const response = await fetch('https://dummyjson.com/users', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include'
+        });
+        const result = await response.json();
+        return result?.users;
+      } catch (err) {
+        console.error('Failed to fetch users:', err);
+      }
+    },
+
+    getBackgroundImageIds: async (_: any, { email }: { email: string }) => {
+      const user = await User.findOne({ email });
+      if (!user) throw new Error('User not found');
+
+      return {
+        backgroundImageId: user.backgroundImageId?.toString() || null,
+        backgroundPlaceholderId: user.backgroundPlaceholderId?.toString() || null
+      };
+    },
+
+    getProfile: async (_parent: any, _args: any, context: any) => {
+      if (!context.user) throw new Error('Unauthorized');
+      return await User.findById(context.user.id);
+    },
+    /**
+     * Get Chat History
+     * @param _parent
+     * @param param1 { userId, selectedId}
+     * @param _context
+     * @returns
+     */
+    getChatHistory: async (
+      _parent: any,
+      { userId, selectedId }: { userId: any; selectedId: any },
+      _context: any
+    ) => {
+      try {
+        if (!userId || !selectedId) {
+          throw new Error('Missing userId or selectedId');
+        }
+
+        const chat = await Chat.findOne({
+          members: { $all: [userId, selectedId], $size: 2 },
+          isGroup: false
+        }).populate({
+          path: 'messages',
+          model: ChatMessage,
+          options: { sort: { createdAt: 1 } },
+          populate: {
+            path: 'sender receiver',
+            model: 'User',
+            select: 'username _id picture isOnline'
+          }
+        });
+
+        return chat?.messages || [];
+      } catch (err) {
+        console.error('❌ Error in getChatHistory:', err);
+        throw new Error('Failed to fetch chat history');
+      }
+    }
+  },
+
+  Mutation: {
+    updateProfileBackground: async (
+      _: any,
+      { username, backgroundImage }: { username: string; backgroundImage: string },
+      context: GraphQLContext
+    ) => {
+      const user = await User.findOneAndUpdate(
+        { username },
+        { backgroundImage },
+        { new: true } // return the updated document
+      );
+
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      //   const io = context.req.app.get('io'); // get socket.io instance
+
+      //   io.emit('newMessage', user);
+
+      return user;
+    },
+
+    updateProfile: async (_parent: any, { userInputs }: { userInputs: any }, context: any) => {
+      const userId = context.user?._id;
+      if (!userId) throw new Error('Unauthorized');
+
+      const updatedUser = await User.findByIdAndUpdate(userId, { $set: userInputs }, { new: true });
+
+      return updatedUser;
+    },
+
+    setBackgroundImage: async (_: any, { email }: { email: string }) => {
+      const db: Db | any = mongoose.connection.db;
+      const gfs = new GridFSBucket(db, {
+        bucketName: 'backgroundImages'
+      });
+
+      const user = await User.findOne({ email });
+      if (!user || !user.backgroundImageId || !user.backgroundPlaceholderId) {
+        throw new Error('User or images not found');
+      }
+
+      const imageUrl = `http://localhost:3700/pic/images/${user.backgroundImageId}`;
+      const placeholderUrl = `http://localhost:3700/pic/images/${user.backgroundPlaceholderId}`;
+
+      return {
+        backgroundImage: imageUrl,
+        backgroundPlaceholder: placeholderUrl
+      };
+    },
+
+    sendMessage: async (_: any, { content }: { content: any }, { req }: { req: any }) => {
+      const io = req.app.get('io'); // get io instance from Express
+
+      // Perform DB operations, etc...
+      const newMessage = {
+        id: Date.now().toString(),
+        content,
+        timestamp: new Date().toISOString()
+      };
+
+      io.emit('newMessage', newMessage); // 🔥 emit socket event
+
+      return newMessage;
+    }
+  }
+};
+
+export default resolvers;
