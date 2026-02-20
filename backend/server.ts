@@ -8,7 +8,7 @@ import session from 'express-session';
 import passport from 'passport';
 import { fileURLToPath } from 'url';
 import path from 'path';
-import { loadFilesSync } from '@graphql-tools/load-files'
+import { loadFilesSync } from '@graphql-tools/load-files';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { graphqlHTTP } from 'express-graphql';
 import { Server } from 'socket.io';
@@ -21,22 +21,31 @@ import picRouter from './pictureRouter';
 import { connectDB } from './db';
 import resolvers from './resolvers';
 import User from './models/User';
+import ChatMessage from './models/ChatMessage';
+import Chat from './models/Chat';
 
 // Initiate app and environment variables
 const app = express();
 const PORT: number = 3700;
-const mongo_uri = process.env.MONGO_URI
-const session_secret = process.env.SESSION_SECRET
+const mongo_uri = process.env.MONGO_URI;
+const session_secret = process.env.SESSION_SECRET;
 
 // Initialize schema
-const typeDefs = loadFilesSync(path.join(__dirname, 'schema.graphql'))
+const typeDefs = loadFilesSync(path.join(__dirname, 'schema.graphql'));
 const schema = makeExecutableSchema({
-    typeDefs, resolvers
-})
+  typeDefs,
+  resolvers
+});
 
 // Cors options
-const allowedOrigins: string[] = ['http://localhost:3700', 'http://localhost:3001'];
-const allowedMethods = ['GET', 'POST', 'PUT'] ;
+const allowedOrigins: string[] = [
+  'http://localhost:3700',
+  'http://localhost:3001',
+  'http://localhost:3006',
+  'http://localhost:3000',
+  '*'
+];
+const allowedMethods = ['GET', 'POST', 'PUT'];
 const allowedHeaders = ['Authorization', 'Content-Type'];
 const exposedHeaders = ['Content-Range', 'Accept-Ranges', 'Content-Length', 'Content-Type'];
 const credentials = true;
@@ -58,46 +67,49 @@ const corsOptions: CorsOptions = {
 
 // Mongo Database Connection
 if (!mongo_uri) {
-    throw new Error('Database credentials are missing from environment variables.');
-  }
-connectDB(mongo_uri!)
+  throw new Error('Database credentials are missing from environment variables.');
+}
+connectDB(mongo_uri!);
 
-// Session store configuration 
-const MongoDBStore = ConnectMongoDBSession(session)
-const store = new MongoDBStore({
-  uri: mongo_uri,
-  collection: 'sessions',
-  expires: 1000 * 60 * 60 * 24 * 7
-} // Sessions expire after 1 week}
+// Session store configuration
+const MongoDBStore = ConnectMongoDBSession(session);
+const store = new MongoDBStore(
+  {
+    uri: mongo_uri,
+    collection: 'sessions',
+    expires: 1000 * 60 * 60 * 24 * 7
+  } // Sessions expire after 1 week}
 );
 
 // Session options
 if (!session_secret) {
-    throw new Error('Session secret is missing from environment variables.');
-  }
-const sessionOptions: any = {
-    name: "auth_session",
-    secret: session_secret,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: false,           // don’t use true unless HTTPS
-      sameSite: 'lax',
-      httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
-    },
-    store: store,
+  throw new Error('Session secret is missing from environment variables.');
 }
+const sessionOptions: any = {
+  name: 'auth_session',
+  secret: session_secret,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: false, // don’t use true unless HTTPS
+    sameSite: 'lax',
+    httpOnly: true,
+    maxAge: 1000 * 60 * 60 * 24 * 7 // 1 week
+  },
+  store: store
+};
+
+app.set('trust-proxy', 1);
 
 // Third-party Middlewares for cors, bodyParser and session
 app.use(cors(corsOptions));
-app.use(cookieParser())
+app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(session(sessionOptions));
 
 // Initialize passport
-app.use(passport.initialize())
-app.use(passport.session())
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Setup auth routes
 app.use('/auth', authRouter);
@@ -110,66 +122,67 @@ app.use('/pic', picRouter);
 
 // Setup graphql transport layer graphqlHTTP
 
-  // Middleware to enable GraphQL Introspection and Client Queries
-  app.use(
-    '/graphql',
-    graphqlHTTP((req: any) => {
-      const isDev = process.env.NODE_ENV === 'development';
-      const protocol = isDev ? 'http' : 'https';//'ws' : 'wss';
-      const host = isDev ? 'localhost:3700' : req.headers.host;
-  
-      return {
-        schema,
-          context: {   
-                req,
-                isAuthenticated: req.isAuthenticated?.(),
-                user: req.user ?? req.session?.user,
-          },
-        graphiql: true
-        // graphiql: {
-        //   subscriptionEndpoint: `${protocol}://${host}/graphql`,
-        // },
-      };
-    })
-);  
+// Middleware to enable GraphQL Introspection and Client Queries
+app.use(
+  '/graphql',
+  graphqlHTTP((req: any) => {
+    const isDev = process.env.NODE_ENV === 'development';
+    const protocol = isDev ? 'http' : 'https'; //'ws' : 'wss';
+    const host = isDev ? 'localhost:3700' : req.headers.host;
+
+    return {
+      schema,
+      context: {
+        req,
+        isAuthenticated: req.isAuthenticated?.(),
+        user: req.user ?? req.session?.user
+      },
+      graphiql: true
+      // graphiql: {
+      //   subscriptionEndpoint: `${protocol}://${host}/graphql`,
+      // },
+    };
+  })
+);
 
 // get Dummy Users
-export async function getUsers(url: string, method: "GET" | "POST"): Promise<any[]> {
-    const options: RequestInit = {
-        method,
-        headers: {
-            "Content-Type": "application/json"
-        },
-        credentials: 'include'
-    }
-   
-        try {
-            const response = await fetch(url, options)
-            const result = await response.json();
-            return result?.users
-        }
-        catch(err) {
-            throw err
-        }
+export async function getUsers(url: string, method: 'GET' | 'POST'): Promise<any[]> {
+  const options: RequestInit = {
+    method,
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    credentials: 'include'
+  };
+
+  try {
+    const response = await fetch(url, options);
+    const result = await response.json();
+    return result?.users;
+  } catch (err) {
+    throw err;
+  }
 }
 
 app.get('/', (req: Request, res: Response) => {
-    res.setHeader('Content-Type', 'text/html');
-    res.send(`<h1>Hello Friend</h1>`);
+  res.setHeader('Content-Type', 'text/html');
+  res.send(`<h1>Hello Friend</h1>`);
 });
 
 app.get('/users', (req: Request, res: Response) => {
-    getUsers('https://dummyjson.com/users', 'GET' )
-    .then(users => { console.log(users); res.json(users) })
-    .catch(err => console.error(err));
-
-})
+  getUsers('https://dummyjson.com/users', 'GET')
+    .then((users) => {
+      console.log(users);
+      res.json(users);
+    })
+    .catch((err) => console.error(err));
+});
 
 // Create a http server instance of the express app/server
 const httpServer = createServer(app);
 
 // Bind the httpServer to the socket.io server(websocket server) for initial TCP handshake/connection
-const io = new Server(httpServer, { cors: corsOptions })
+const io = new Server(httpServer, { cors: corsOptions });
 
 // Get the io reference from the app server
 app.set('io', io);
@@ -177,50 +190,116 @@ app.set('io', io);
 const onlineUsers = new Map();
 // socket-io server listens for bidirectional and persistent TCP connection with io-client
 io.on('connection', (socket: any) => {
-    console.log('Socket.io server is connected');
+  console.log('Socket.io server is connected');
 
-    socket.on('authenticated', async ({ userId }: { userId: any }) => {
-        socket.data.userId = userId;
-        onlineUsers.set(userId, socket.id)
-        const onlineUser = await User.findById(userId);
-        if (onlineUser) {
-            onlineUser.isOnline = true
-            await onlineUser.save();
-            socket.broadcast.emit('userOnline', { userId, online: onlineUser.isOnline });
-        }   
-        console.log(onlineUsers);
-    
-        // Notify others this user came online
-       
-    
-        // ✅ Send current online users to the newly logged-in user
-        const otherOnlineUsers = [...onlineUsers.keys()].filter((id) => id !== userId);
-        // Set isOnline = true in DB for others (optional if you want to persist status)
-        for (const id of otherOnlineUsers) {
-            const userDoc = await User.findById(id);
-            if (userDoc) {
-                userDoc.isOnline = true;
-                await userDoc.save();
-            }
-        }
-       
-        socket.emit('usersOnline', { userIds: otherOnlineUsers, online: true });
-    })
-
-    socket.on('disconnect', async() => {
-        console.log('🔴 Client disconnected:', socket.id);
-        const userId = socket.data.userId;
-        if (userId) {
-            const signedOutUser = await User.findById(userId)
-            if (signedOutUser) {
-                signedOutUser.isOnline = false
-                await signedOutUser.save();
-            }
-        onlineUsers.delete(userId);
-        socket.broadcast.emit('userOffline', { userId });
+  socket.on('authenticated', async ({ userId }: { userId: any }) => {
+    socket.data.userId = userId;
+    onlineUsers.set(userId, socket.id);
+    const onlineUser = await User.findById(userId);
+    if (onlineUser) {
+      onlineUser.isOnline = true;
+      await onlineUser.save();
+      socket.broadcast.emit('userOnline', { userId, online: onlineUser.isOnline });
     }
-    });
-})
+    console.log(onlineUsers);
+
+    // Notify others this user came online
+
+    // ✅ Send current online users to the newly logged-in user
+    const otherOnlineUsers = [...onlineUsers.keys()].filter((id) => id !== userId);
+    // Set isOnline = true in DB for others (optional if you want to persist status)
+    for (const id of otherOnlineUsers) {
+      const userDoc = await User.findById(id);
+      if (userDoc) {
+        userDoc.isOnline = true;
+        await userDoc.save();
+      }
+    }
+
+    socket.emit('usersOnline', { userIds: otherOnlineUsers, online: true });
+  });
+
+  socket.on('joinChat', ({ userId }: { userId: any }) => {
+    if (!userId) return;
+    console.log(`${userId} joined chat`);
+    socket.data.userId = userId;
+    socket.join(userId); // Join personal room
+  });
+
+  socket.on('sendMessage', async ({ content, receiverId }: { content: any; receiverId: any }) => {
+    const senderId = socket.data.userId;
+    if (!senderId || !receiverId || !content) return;
+
+    try {
+      // ✅ Find or create the 1-to-1 chat
+      let chat = await Chat.findOne({
+        members: { $all: [senderId, receiverId], $size: 2 },
+        isGroup: false
+      });
+
+      if (!chat) {
+        chat = new Chat({ members: [senderId, receiverId], isGroup: false });
+        await chat.save();
+      }
+
+      // ✅ Create and save new message
+      let message = new ChatMessage({
+        chat: chat._id,
+        sender: senderId,
+        receiver: receiverId,
+        content
+      });
+
+      await message.save();
+
+      // ✅ Update sender/receiver user data
+      const recipientUser = await User.findById(receiverId);
+      const senderUser = await User.findById(senderId);
+
+      console.log(senderUser?.username, recipientUser?.username);
+
+      // ✅ Add message to chat
+      chat.messages.push(message._id);
+      await chat.save();
+
+      message = await message.populate([
+        { path: 'sender', select: 'username picture isOnline' },
+        { path: 'receiver', select: 'username picture isOnline' }
+      ]);
+
+      // ✅ Emit updated message to both users
+      [senderId, receiverId].forEach((id) => {
+        io.to(id).emit('newMessage', {
+          _id: message._id,
+          chatId: chat._id,
+          sender: message.sender,
+          receiver: message.receiver,
+          content: message.content,
+          createdAt: message.createdAt,
+          lastMessage: content
+          //   unreadCounts: recipientUser.unreadCounts,
+          //   unreadMsgs: recipientUser.unread,
+        });
+      });
+    } catch (error) {
+      console.error('❌ sendMessage error:', error);
+    }
+  });
+
+  socket.on('disconnect', async () => {
+    console.log('🔴 Client disconnected:', socket.id);
+    const userId = socket.data.userId;
+    if (userId) {
+      const signedOutUser = await User.findById(userId);
+      if (signedOutUser) {
+        signedOutUser.isOnline = false;
+        await signedOutUser.save();
+      }
+      onlineUsers.delete(userId);
+      socket.broadcast.emit('userOffline', { userId });
+    }
+  });
+});
 
 // http server listens for initial TCP connection
 httpServer.listen(PORT, () => {
